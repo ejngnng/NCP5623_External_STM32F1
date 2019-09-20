@@ -1,0 +1,3 @@
+# NCP5623_External_STM32F1
+
+#### STM32F103 I2C Slave
