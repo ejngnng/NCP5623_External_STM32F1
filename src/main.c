@@ -7,7 +7,6 @@ int main(){
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
     driver_usart1_setup();
     driver_i2c1_setup();
-    driver_slave_init();
     driver_tick_setup();
     rcc_periph_clock_enable(RCC_GPIOC);
     gpio_set_mode(

@@ -14,7 +14,6 @@ typedef struct _rgb_t{
 }rgb_t;
 
 void driver_i2c1_setup();
-void driver_slave_init();
 
 void i2c1_ev_isr();
 
