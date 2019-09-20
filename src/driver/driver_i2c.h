@@ -6,12 +6,7 @@
 #include <libopencm3/stm32/i2c.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
-
-typedef struct _rgb_t{
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-}rgb_t;
+#include "color/color.h"
 
 void driver_i2c1_setup();
 
