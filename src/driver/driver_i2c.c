@@ -9,6 +9,12 @@
  **/
 #define NCP5623_I2C_ADD   0x38
 
+
+
+rgb_t Colors;
+static uint8_t counter;
+bool update;
+
 void driver_i2c1_setup(){
     rcc_periph_clock_enable(RCC_GPIOB);
     rcc_periph_clock_enable(RCC_AFIO);
@@ -74,19 +80,56 @@ void i2c1_ev_isr(){
     if(I2C_SR1(I2C1) & I2C_SR1_ADDR){
         sr1 = I2C_SR1(I2C1);
         sr2 = I2C_SR2(I2C1);
+        (void)sr1;
         (void)sr2;
+        #if (DEBUG_IIC==1)
         printf("Address matched\n");
+        #endif
     }
 
     if(I2C_SR1(I2C1) & I2C_SR1_RxNE){
         uint8_t data = i2c_get_data(I2C1);
-        printf("data: %02X\n", data);
+        switch(data & 0xE0){
+            case 0:
+                break;
+            case 0x20:
+                break;
+            case 0x40:
+                #if (DEBUG_IIC==1)
+                printf("PWM1: %02X\n", data & 0x1F);
+                #endif
+                counter++;
+                Colors.r = data & 0x1F;
+                break;
+            case 0x60:
+                #if (DEBUG_IIC==1)
+                printf("PWM2: %02X\n", data & 0x1F);
+                #endif
+                counter++;
+                Colors.g = data & 0x1F;
+                break;
+            case 0x80:
+                #if (DEBUG_IIC==1)
+                printf("PWM3: %02X\n", data & 0x1F);
+                #endif
+                counter++;
+                Colors.b = data & 0x1F;
+                break;
+            default:
+                break;
+        }
+        if(counter >= 3){
+            counter = 0;
+            update = true;
+        }
     }
 
     if(I2C_SR1(I2C1) & I2C_SR1_STOPF){
         sr1 = I2C_SR1(I2C1);
         i2c_peripheral_enable(I2C1);
+        #if (DEBUG_IIC==1)
         printf("Master stop, data: %02X\n", i2c_get_data(I2C1));
+        #endif
     }
 
 }

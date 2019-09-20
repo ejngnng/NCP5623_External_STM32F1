@@ -7,6 +7,12 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/cm3/nvic.h>
 
+typedef struct _rgb_t{
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+}rgb_t;
+
 void driver_i2c1_setup();
 void driver_slave_init();
 
