@@ -4,14 +4,16 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <errno.h>
+#include <stdarg.h>
 #include <libopencm3/cm3/common.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/usart.h>
 
-
+#define CMD_BUFFER_LEN  64
 
 void driver_usart1_setup();
-int _write(int file, char *ptr, int len);
+void driver_usart1_puts(char *s);
+void usart1_printf(char *fmt, ...);
 
 #endif

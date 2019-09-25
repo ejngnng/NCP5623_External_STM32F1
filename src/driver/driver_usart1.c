@@ -28,16 +28,19 @@ void driver_usart1_setup(){
 	usart_enable(USART1);
 }
 
-
-int _write(int file, char *ptr, int len){
-	int i;
-
-	if (file == 1) {
-		for (i = 0; i < len; i++)
-			usart_send_blocking(USART1, ptr[i]);
-		return i;
+void driver_usart1_puts(char *s){
+	while(*s){
+		usart_send_blocking(USART1, *s);
+		s++;
 	}
+	return;
+}
 
-	errno = EIO;
-	return -1;
+void usart1_printf(char *fmt, ...){
+	char buffer[CMD_BUFFER_LEN + 1];
+	va_list arg_ptr;
+	va_start(arg_ptr, fmt); 
+	vsnprintf(buffer, CMD_BUFFER_LEN+1, fmt, arg_ptr);
+	driver_usart1_puts(buffer);
+	va_end(arg_ptr);	
 }
