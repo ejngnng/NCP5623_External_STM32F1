@@ -30,7 +30,9 @@ int main(){
     while(1){
         if(update){
             update = false;
+            #if (DEBUG==1)
             printf("red: %02X, green: %02X, blue: %02X\n", Colors.r, Colors.g, Colors.b);
+            #endif
             for(uint8_t i=0; i<LED_NUMS; i++){
                 driver_ws2812_set_pixel_rgb(Colors, i);
             }

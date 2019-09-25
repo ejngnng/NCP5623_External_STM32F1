@@ -2,6 +2,8 @@
 #define COLOR_H
 
 #include <stdint.h>
+#include <string.h>
+#include <stdlib.h>
 
 /// Representation of an RGB pixel (Red, Green, Blue)
 typedef struct {
