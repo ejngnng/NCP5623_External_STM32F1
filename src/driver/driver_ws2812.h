@@ -25,6 +25,7 @@
 
 
 void driver_ws2812_setup(uint8_t nums);
+void driver_ws2812_set_rgb(rgb_t rgb, uint8_t *buffer);
 
 void driver_ws2812_set_pixel_rgb(rgb_t rgb, uint8_t nums);
 

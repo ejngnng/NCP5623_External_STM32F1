@@ -6,7 +6,7 @@
 static uint8_t *frame_buffer = NULL;
 static uint8_t led_nums = 0;
 
-static void driver_ws2812_set_rgb(rgb_t rgb, uint8_t *buffer);
+
 
 void driver_ws2812_setup(uint8_t nums){
     led_nums = nums;
@@ -15,7 +15,7 @@ void driver_ws2812_setup(uint8_t nums){
 }
 
 
-static void driver_ws2812_set_rgb(rgb_t rgb, uint8_t *buffer){
+void driver_ws2812_set_rgb(rgb_t rgb, uint8_t *buffer){
     for(uint8_t i=0; i<8; i++){
         if(rgb.green >> i & 1){
             *(buffer + i) = WS2812_BIT1;

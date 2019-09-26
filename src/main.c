@@ -8,6 +8,7 @@ extern bool update;
 void vTask_Setup();
 static void vTask_Blink(void *args);
 static void vTask_Sync(void *args);
+static void vTask_Nav(void *args);
 
 int main(){
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
@@ -51,7 +52,8 @@ int main(){
 
 void vTask_Setup(){
     xTaskCreate(vTask_Blink, "Blink", 50, NULL, 1, NULL);
-    xTaskCreate(vTask_Sync, "Sync", 500, NULL, 2, NULL);
+    // xTaskCreate(vTask_Sync, "Sync", 500, NULL, 3, NULL);
+    xTaskCreate(vTask_Nav, "Nav", 500, NULL, 2, NULL);
     vTaskStartScheduler();
 }
 
@@ -82,5 +84,28 @@ static void vTask_Sync(void *args){
         }
 
         vTaskDelay(2);
+    }
+}
+
+static void vTask_Nav(void *args){
+    driver_dma1_setup(DMA_CHANNEL5);
+    uint8_t *nav_buffer = NULL;
+    nav_buffer = (uint8_t *)malloc(sizeof(uint8_t) * (LED_NUMS*24 + 2));
+    memset(nav_buffer, 0, sizeof(uint8_t) * (LED_NUMS*24 + 2));
+    for(uint8_t i=0; i<LED_NUMS; i++){
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Red), &nav_buffer[1+i*24]);
+    }
+    driver_dma_transmit(DMA_CHANNEL5, nav_buffer, (LED_NUMS*24 + 2));
+    while(1){
+        for(uint8_t i=0; i<LED_NUMS; i++){
+            driver_ws2812_set_rgb(color_to_rgb(RGB_Red), &nav_buffer[1+i*24]);
+        }
+        driver_dma_transmit(DMA_CHANNEL5, nav_buffer, (LED_NUMS*24 + 2));
+        vTaskDelay(500);
+        for(uint8_t i=0; i<LED_NUMS; i++){
+            driver_ws2812_set_rgb(color_to_rgb(RGB_Black), &nav_buffer[1+i*24]);
+        }
+        driver_dma_transmit(DMA_CHANNEL5, nav_buffer, (LED_NUMS*24 +2));
+        vTaskDelay(500);
     }
 }
