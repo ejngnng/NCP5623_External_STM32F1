@@ -5,6 +5,10 @@ extern bool update;
 
 #define LED_NUMS    3
 
+void vTask_Setup();
+static void vTask_Blink(void *args);
+static void vTask_Sync(void *args);
+
 int main(){
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
     driver_usart1_setup();
@@ -26,6 +30,7 @@ int main(){
     );
     memset(&Colors, 0, sizeof(rgb_t));
     update = false;
+    vTask_Setup();
     printf("setup done!!!\n");
     while(1){
         if(update){
@@ -42,4 +47,27 @@ int main(){
         }
     }
     return 0;
+}
+
+void vTask_Setup(){
+    xTaskCreate(vTask_Blink, "Blink", 50, NULL, 1, NULL);
+    xTaskCreate(vTask_Sync, "Sync", 500, NULL, 2, NULL);
+    vTaskStartScheduler();
+}
+
+static void vTask_Blink(void *args){
+    while(1){
+        gpio_toggle(GPIOC, GPIO13);
+        vTaskDelay(500);
+    }
+}
+
+static void vTask_Sync(void *args){
+    while(1){
+        for(uint8_t i=0; i<LED_NUMS; i++){
+            driver_ws2812_set_pixel_rgb(Colors, i);
+        }
+        driver_ws2812_show();
+        vTaskDelay(2);
+    }
 }

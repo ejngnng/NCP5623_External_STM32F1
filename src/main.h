@@ -8,6 +8,8 @@
 #include "driver/driver_dma1.h"
 #include "driver/driver_tim2.h"
 #include "driver/driver_ws2812.h"
+#include "FreeRTOS/FreeRTOS.h"
+#include "FreeRTOS/task.h"
 
 
 #endif
