@@ -66,10 +66,13 @@ static void vTask_Blink(void *args){
 
 static void vTask_Sync(void *args){
     while(1){
-        for(uint8_t i=0; i<LED_NUMS; i++){
-            driver_ws2812_set_pixel_rgb(Colors, i);
+        if(update){
+            update = false;
+            for(uint8_t i=0; i<LED_NUMS; i++){
+                driver_ws2812_set_pixel_rgb(Colors, i);
+            }
+            driver_ws2812_show();
         }
-        driver_ws2812_show();
         vTaskDelay(2);
     }
 }
