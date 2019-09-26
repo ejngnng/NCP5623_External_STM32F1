@@ -33,6 +33,7 @@ int main(){
     vTask_Setup();
     printf("setup done!!!\n");
     while(1){
+        #if 0
         if(update){
             update = false;
             #if (DEBUG==1)
@@ -45,6 +46,7 @@ int main(){
         }else{
             gpio_toggle(GPIOC, GPIO13);
         }
+        #endif
     }
     return 0;
 }
