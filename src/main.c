@@ -12,6 +12,8 @@ int main(){
     driver_tick_setup();
     driver_timer2_setup();
     driver_dma1_setup(DMA_CHANNEL5);
+    driver_dma1_setup(DMA_CHANNEL1);
+    driver_dma1_setup(DMA_CHANNEL7);
     driver_ws2812_setup(LED_NUMS);
     driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Red), 0);
     driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Blue), 1);
@@ -39,6 +41,8 @@ int main(){
             driver_ws2812_show();
         }else{
             gpio_toggle(GPIOC, GPIO13);
+            driver_ws2812_show();
+            delay_ms(100);
         }
     }
     return 0;
