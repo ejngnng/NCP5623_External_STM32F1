@@ -42,9 +42,11 @@ void driver_ws2812_set_pixel_rgb(rgb_t rgb, uint8_t nums){
 }
 
 void driver_ws2812_show(){
-    // driver_tim2ch1_dma1ch5_transmit(frame_buffer, (led_nums*24+2));
+    #if (DEBUG_TASK==1)
     driver_dma_transmit(DMA_CHANNEL1, frame_buffer, (led_nums*24+2));
     driver_dma_transmit(DMA_CHANNEL7, frame_buffer, (led_nums*24+2));
     driver_dma_transmit(DMA_CHANNEL5, frame_buffer, (led_nums*24+2));
-    // driver_dma_transmit(DMA_CHANNEL6, frame_buffer, (led_nums*24+2));
+    #else
+    driver_dma_transmit(DMA_CHANNEL7, frame_buffer, (led_nums*24+2));
+    #endif
 }
