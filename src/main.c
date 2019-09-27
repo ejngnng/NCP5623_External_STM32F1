@@ -20,9 +20,11 @@ int main(){
     // driver_timer2_channel_setup(TIM_OC3);
     // driver_dma1_setup(DMA_CHANNEL7);
     // driver_dma1_setup(DMA_CHANNEL1);
-    // // driver_timer2_setup();
-    // // driver_dma1_setup(DMA_CHANNEL5);
-    // driver_ws2812_setup(LED_NUMS);
+    driver_timer2_setup();
+    driver_dma1_setup(DMA_CHANNEL1);
+    driver_dma1_setup(DMA_CHANNEL5);
+    driver_dma1_setup(DMA_CHANNEL7);
+    driver_ws2812_setup(LED_NUMS);
     // driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Red), 0);
     // driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Blue), 1);
     // driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Blue), 2);
@@ -40,9 +42,9 @@ int main(){
 
 void vTask_Setup(){
     xTaskCreate(vTask_Blink, "Blink", 50, NULL, 1, NULL);
-    xTaskCreate(vTask_Sync, "Sync", 500, NULL, 3, NULL);
-    xTaskCreate(vTask_Nav, "Nav", 500, NULL, 2, NULL);
-    xTaskCreate(VTask_Test, "Test", 300, NULL, 4, NULL);
+    // xTaskCreate(vTask_Sync, "Sync", 500, NULL, 3, NULL);
+    // xTaskCreate(vTask_Nav, "Nav", 500, NULL, 2, NULL);
+    xTaskCreate(VTask_Test, "Test", 500, NULL, 4, NULL);
     vTaskStartScheduler();
 }
 
@@ -64,13 +66,6 @@ static void vTask_Blink(void *args){
 
 static void vTask_Sync(void *args){
     uint32_t last_update = 0;
-    driver_timer2_channel_setup(TIM_OC2);
-    driver_timer2_channel_setup(TIM_OC3);
-    driver_dma1_setup(DMA_CHANNEL7);
-    driver_dma1_setup(DMA_CHANNEL1);
-    // driver_timer2_setup();
-    // driver_dma1_setup(DMA_CHANNEL5);
-    driver_ws2812_setup(LED_NUMS);
     driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Red), 0);
     driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Blue), 1);
     driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Blue), 2);
@@ -125,6 +120,10 @@ static void vTask_Nav(void *args){
 static void VTask_Test(void *args){
     while(1){
         usart1_printf("4. Test...\n");
+        for(uint8_t i=0; i<LED_NUMS; i++){
+            driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Red), i);
+        }
+        driver_ws2812_show();
         vTaskDelay(200);
     }
 }
