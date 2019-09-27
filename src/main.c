@@ -9,6 +9,7 @@ void vTask_Setup();
 static void vTask_Blink(void *args);
 static void vTask_Sync(void *args);
 static void vTask_Nav(void *args);
+static void vTask_Tail(void *args);
 
 #if (DEBUG_TASK==1)
 static void VTask_Test(void *args);
@@ -37,8 +38,9 @@ int main(){
 
 void vTask_Setup(){
     xTaskCreate(vTask_Blink, "Blink", 50, NULL, 1, NULL);
-    xTaskCreate(vTask_Sync, "Sync", 500, NULL, 3, NULL);
+    xTaskCreate(vTask_Sync, "Sync", 500, NULL, 5, NULL);
     xTaskCreate(vTask_Nav, "Nav", 500, NULL, 2, NULL);
+    xTaskCreate(vTask_Tail, "Tail", 500, NULL, 3, NULL);
     #if (DEBUG_TASK==1)
     xTaskCreate(VTask_Test, "Test", 500, NULL, 4, NULL);
     #endif
@@ -109,13 +111,51 @@ static void vTask_Nav(void *args){
             driver_ws2812_set_rgb(color_to_rgb(RGB_Red), &nav_buffer[1+i*24]);
         }
         driver_dma_transmit(DMA_CHANNEL5, nav_buffer, (LED_NUMS*24 + 2));
-        vTaskDelay(200);
+        vTaskDelay(500);
         for(uint8_t i=0; i<LED_NUMS; i++){
             driver_ws2812_set_rgb(color_to_rgb(RGB_Black), &nav_buffer[1+i*24]);
         }
         driver_dma_transmit(DMA_CHANNEL5, nav_buffer, (LED_NUMS*24 +2));
-        vTaskDelay(200);
+        vTaskDelay(500);
     }
+}
+
+static void vTask_Tail(void *args){
+    uint8_t *tail_buffer = NULL;
+    tail_buffer = (uint8_t *)malloc(sizeof(uint8_t) * (LED_NUMS*24 + 2));
+    memset(tail_buffer, 0, sizeof(uint8_t) * (LED_NUMS*24 + 2));
+    for(uint8_t i=0; i<LED_NUMS; i++){
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Blue), &tail_buffer[1+i*24]);
+    }
+    driver_dma_transmit(DMA_CHANNEL1, tail_buffer, (LED_NUMS*24 + 2));
+    while(1){
+        #if (DEBUG==1)
+        usart1_printf("5. Tail...\n");
+        #endif
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Blue), &tail_buffer[1+0*24]);
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Black),&tail_buffer[1+1*24]);
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Black),&tail_buffer[1+2*24]);
+        driver_dma_transmit(DMA_CHANNEL1, tail_buffer, (LED_NUMS*24 + 2));
+        vTaskDelay(200);
+
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Blue), &tail_buffer[1+0*24]);
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Blue),&tail_buffer[1+1*24]);
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Black),&tail_buffer[1+2*24]);
+        driver_dma_transmit(DMA_CHANNEL1, tail_buffer, (LED_NUMS*24 + 2));
+        vTaskDelay(200);
+
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Blue), &tail_buffer[1+0*24]);
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Blue),&tail_buffer[1+1*24]);
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Blue),&tail_buffer[1+2*24]);
+        driver_dma_transmit(DMA_CHANNEL1, tail_buffer, (LED_NUMS*24 + 2));
+        vTaskDelay(200);
+
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Black), &tail_buffer[1+0*24]);
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Black),&tail_buffer[1+1*24]);
+        driver_ws2812_set_rgb(color_to_rgb(RGB_Black),&tail_buffer[1+2*24]);
+        driver_dma_transmit(DMA_CHANNEL1, tail_buffer, (LED_NUMS*24 + 2));
+        vTaskDelay(200);
+    }    
 }
 
 #if (DEBUG_TASK==1)
