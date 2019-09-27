@@ -8,6 +8,8 @@
 
 void driver_timer2_setup();
 
+void driver_timer2_channel_setup(enum tim_oc_id channel);
+
 void tim2_isr();
 
 #endif

@@ -65,7 +65,7 @@ void driver_dma1_clock_setup(){
 void driver_dma1_ch1_setup(){
 
     dma_channel_reset(DMA1,DMA_CHANNEL1);
-    dma_set_peripheral_address(DMA1,DMA_CHANNEL1,(uint32_t)&TIM4_CCR1);
+    dma_set_peripheral_address(DMA1,DMA_CHANNEL1,(uint32_t)&TIM2_CCR3);
     dma_set_read_from_memory(DMA1,DMA_CHANNEL1);
     dma_enable_memory_increment_mode(DMA1,DMA_CHANNEL1);
     dma_set_peripheral_size(DMA1,DMA_CHANNEL1,DMA_CCR_PSIZE_16BIT);
