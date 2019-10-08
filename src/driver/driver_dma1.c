@@ -199,7 +199,7 @@ void dma1_channel4_isr(){
 
 void dma1_channel5_isr(){
    #if (DEBUG_DMA == 1)
-    printf("DMA ch5 isr\n");
+    usart1_printf("DMA ch5 isr\n");
    #endif
     if(dma_get_interrupt_flag(DMA1, DMA_CHANNEL5, DMA_TCIF)){
         dma_clear_interrupt_flags(DMA1, DMA_CHANNEL5, DMA_TCIF);
@@ -207,7 +207,7 @@ void dma1_channel5_isr(){
         // driver_dma_stop();
         // timer_disable_oc_output(TIM2, TIM_OC1);
         #if (DEBUG_DMA == 1)
-        printf("DMA send complete\n");
+        usart1_printf("DMA send complete\n");
         #endif
     }
 }
