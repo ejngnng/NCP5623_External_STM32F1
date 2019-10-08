@@ -1,5 +1,8 @@
 #include "driver_i2c.h"
+
+#if (DEBUG_IIC == 1)
 #include "driver_usart1.h"
+#endif
 /**
  * 
  * I2C1_SCL---PB6 
@@ -55,7 +58,7 @@ void i2c1_ev_isr(){
         (void)sr1;
         (void)sr2;
         #if (DEBUG_IIC==1)
-        printf("Address matched\n");
+        usart1_printf("Address matched\n");
         #endif
     }
 
@@ -68,21 +71,21 @@ void i2c1_ev_isr(){
                 break;
             case 0x40:
                 #if (DEBUG_IIC==1)
-                printf("PWM1: %02X\n", data & 0x1F);
+                usart1_printf("PWM1: %02X\n", data & 0x1F);
                 #endif
                 counter++;
                 Colors.r = data & 0x1F;
                 break;
             case 0x60:
                 #if (DEBUG_IIC==1)
-                printf("PWM2: %02X\n", data & 0x1F);
+                usart1_printf("PWM2: %02X\n", data & 0x1F);
                 #endif
                 counter++;
                 Colors.g = data & 0x1F;
                 break;
             case 0x80:
                 #if (DEBUG_IIC==1)
-                printf("PWM3: %02X\n", data & 0x1F);
+                usart1_printf("PWM3: %02X\n", data & 0x1F);
                 #endif
                 counter++;
                 Colors.b = data & 0x1F;
@@ -100,7 +103,7 @@ void i2c1_ev_isr(){
         sr1 = I2C_SR1(I2C1);
         i2c_peripheral_enable(I2C1);
         #if (DEBUG_IIC==1)
-        printf("Master stop, data: %02X\n", i2c_get_data(I2C1));
+        usart1_printf("Master stop, data: %02X\n", i2c_get_data(I2C1));
         #endif
     }
 
