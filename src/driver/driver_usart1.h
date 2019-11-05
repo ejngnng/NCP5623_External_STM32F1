@@ -10,7 +10,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/usart.h>
 
-#define CMD_BUFFER_LEN  64
+#define CMD_BUFFER_LEN  128
 
 void driver_usart1_setup();
 void driver_usart1_puts(char *s);

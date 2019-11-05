@@ -11,6 +11,12 @@ static void VTask_Test(void *args);
 int main(){
     rcc_clock_setup_in_hse_8mhz_out_72mhz();
     driver_usart1_setup();
+    driver_usart1_puts("*****************************************\n");
+    driver_usart1_puts("Name: APM_EXTERNAL_LED_V2.0.0\n");
+    driver_usart1_puts("Description: External LED for ArduPilot\n");
+    driver_usart1_puts("Author: ninja\n");
+    driver_usart1_puts("Date: 2019-09-28\n");
+    driver_usart1_puts("*****************************************\n");
     vTask_Setup();
     while(1){
 
