@@ -1,6 +1,10 @@
 #include "main.h"
 
+extern bool sync_timeout;
+
 void vTask_Setup();
+static void led_mode_double_flash();
+static void led_mode_slow_flash();
 static void vTask_Blink(void *args);
 
 
@@ -48,7 +52,28 @@ static void vTask_Blink(void *args){
         #if (DEBUG==1)
         usart1_printf("1. Blink...\n");
         #endif
-        gpio_toggle(GPIOC, GPIO13);
-        vTaskDelay(500);
+        if(sync_timeout){
+            led_mode_double_flash();
+        }else{
+            led_mode_slow_flash();
+        }
+
     }
+}
+
+
+static void led_mode_double_flash(){
+    gpio_clear(GPIOC, GPIO13);
+    vTaskDelay(100);
+    gpio_set(GPIOC, GPIO13);
+    vTaskDelay(100);
+    gpio_clear(GPIOC, GPIO13);
+    vTaskDelay(100);
+    gpio_set(GPIOC, GPIO13);
+    vTaskDelay(500);
+}
+
+static void led_mode_slow_flash(){
+    gpio_toggle(GPIOC, GPIO13);
+    vTaskDelay(500);
 }
