@@ -9,11 +9,13 @@
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/usart.h>
+#include "miniprintf.h"
 
-#define CMD_BUFFER_LEN  128
+#define CMD_BUFFER_LEN  64
 
 void driver_usart1_setup();
 void driver_usart1_puts(char *s);
-void usart1_printf(char *fmt, ...);
+void driver_usart1_putc(char c);
+int usart1_printf(char *fmt, ...);
 
 #endif

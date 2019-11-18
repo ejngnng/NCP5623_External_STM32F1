@@ -36,11 +36,16 @@ void driver_usart1_puts(char *s){
 	return;
 }
 
-void usart1_printf(char *fmt, ...){
-	char buffer[CMD_BUFFER_LEN + 1];
-	va_list arg_ptr;
-	va_start(arg_ptr, fmt); 
-	vsnprintf(buffer, CMD_BUFFER_LEN+1, fmt, arg_ptr);
-	driver_usart1_puts(buffer);
-	va_end(arg_ptr);	
+void driver_usart1_putc(char c){
+	usart_send_blocking(USART1, c);
+}
+
+int usart1_printf(char *fmt, ...){
+	va_list args;
+	int rc;
+
+	va_start(args, fmt);
+	rc = mini_vprintf_uncooked(driver_usart1_putc, fmt, args);
+	va_end(args);
+	return rc;
 }
