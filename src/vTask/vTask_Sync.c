@@ -17,7 +17,7 @@ static void vTask_Sync_Setup(){
     sync_timeout = true;
     memset(&Colors, 0, sizeof(rgb_t));
     driver_ws2812_setup(SYNC_LED_NUMS);
-    driver_i2c1_setup();
+    driver_i2c1_setup(ANYLED_I2C_ADD);
     driver_timer2_setup();
     driver_dma1_setup(DMA_CHANNEL7);
 }

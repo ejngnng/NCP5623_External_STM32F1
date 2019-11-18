@@ -2,6 +2,6 @@
 #define VERSION_H
 
 #define THISFIRMWARE    "APM_EXTERNAL_LED"
-#define THISVERSION     "V2.0.1"
+#define THISVERSION     "V2.0.2"
 
 #endif

@@ -8,7 +8,10 @@
 #include <libopencm3/cm3/nvic.h>
 #include "color/color.h"
 
-void driver_i2c1_setup();
+#define NCP5623_I2C_ADD   0x38
+#define ANYLED_I2C_ADD    0x90
+
+void driver_i2c1_setup(uint8_t addr);
 
 void i2c1_ev_isr();
 

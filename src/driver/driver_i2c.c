@@ -10,7 +10,6 @@
  * 
  * 
  **/
-#define NCP5623_I2C_ADD   0x38
 
 
 
@@ -18,7 +17,8 @@ rgb_t Colors;
 static uint8_t counter;
 bool update;
 
-void driver_i2c1_setup(){
+
+void driver_i2c1_setup(uint8_t addr){
     rcc_periph_clock_enable(RCC_GPIOB);
     rcc_periph_clock_enable(RCC_AFIO);
     rcc_periph_clock_enable(RCC_I2C1);
@@ -37,7 +37,7 @@ void driver_i2c1_setup(){
     i2c_set_clock_frequency(I2C1, I2C_CR2_FREQ_36MHZ);
     i2c_set_standard_mode(I2C1);
 
-	i2c_set_own_7bit_slave_address(I2C1, NCP5623_I2C_ADD);
+	i2c_set_own_7bit_slave_address(I2C1, addr);
 
 
     i2c_enable_interrupt(I2C1, I2C_CR2_ITEVTEN | I2C_CR2_ITBUFEN);
@@ -49,7 +49,52 @@ void driver_i2c1_setup(){
 
 }
 
+// ANYLED for ardupilot
+void i2c1_ev_isr(){
+    uint32_t sr1, sr2;
+    if(I2C_SR1(I2C1) & I2C_SR1_ADDR){
+        sr1 = I2C_SR1(I2C1);
+        sr2 = I2C_SR2(I2C1);
+        (void)sr1;
+        (void)sr2;
+        #if (DEBUG_IIC==1)
+        usart1_printf("Address matched\n");
+        #endif
+    }
 
+    if(I2C_SR1(I2C1) & I2C_SR1_RxNE){
+        uint8_t data = i2c_get_data(I2C1);
+        switch(counter){
+            case 0:
+                Colors.r = data;
+                counter ++;
+                break;
+            case 1:
+                Colors.g = data;
+                counter ++;
+                break;
+            case 2:
+                Colors.b = data;
+                counter = 0;
+                update = true;
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    if(I2C_SR1(I2C1) & I2C_SR1_STOPF){
+        sr1 = I2C_SR1(I2C1);
+        i2c_peripheral_enable(I2C1);
+        #if (DEBUG_IIC==1)
+        usart1_printf("Master stop, data: %02X\n", i2c_get_data(I2C1));
+        #endif
+    }
+
+}
+
+#if 0 // NCP5623 LED data
 void i2c1_ev_isr(){
     uint32_t sr1, sr2;
     if(I2C_SR1(I2C1) & I2C_SR1_ADDR){
@@ -108,3 +153,4 @@ void i2c1_ev_isr(){
     }
 
 }
+#endif
