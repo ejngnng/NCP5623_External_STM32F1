@@ -7,6 +7,7 @@
 #include "vTask/vTask_Sync.h"
 #include "vTask/vTask_Nav.h"
 #include "vTask/vTask_Tail.h"
+#include "version/version.h"
 
 
 #endif
