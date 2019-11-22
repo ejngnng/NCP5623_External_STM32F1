@@ -52,17 +52,16 @@ void driver_i2c1_setup(uint8_t addr){
 // ANYLED for ardupilot
 void i2c1_ev_isr(){
     uint32_t sr1, sr2;
-    if(I2C_SR1(I2C1) & I2C_SR1_ADDR){
-        sr1 = I2C_SR1(I2C1);
+    sr1 = I2C_SR1(I2C1);
+
+    // address matched slave
+    if(sr1 & I2C_SR1_ADDR){
         sr2 = I2C_SR2(I2C1);
-        (void)sr1;
         (void)sr2;
         #if (DEBUG_IIC==1)
         usart1_printf("Address matched\n");
         #endif
-    }
-
-    if(I2C_SR1(I2C1) & I2C_SR1_RxNE){
+    }else if(sr1 & I2C_SR1_RxNE){ // Receive buffer not empty
         uint8_t data = i2c_get_data(I2C1);
         switch(counter){
             case 0:
@@ -81,15 +80,16 @@ void i2c1_ev_isr(){
             default:
                 break;
         }
-
-    }
-
-    if(I2C_SR1(I2C1) & I2C_SR1_STOPF){
-        sr1 = I2C_SR1(I2C1);
+    }else if((sr1 & I2C_SR1_TxE) && !(sr1 & I2C_SR1_BTF)){ // transmit buffer empty & data transfer not finished
+        i2c_send_data(I2C1, 0);
+    }else if(sr1 & I2C_SR1_STOPF){  // done by master by sending STOP
+       // sr1 = I2C_SR1(I2C1);        // this even happens when slave is in Recv mode at the end of communication
         i2c_peripheral_enable(I2C1);
         #if (DEBUG_IIC==1)
         usart1_printf("Master stop, data: %02X\n", i2c_get_data(I2C1));
         #endif
+    }else if(sr1 & I2C_SR1_AF){ // this event happens when slave is in transmit mode at the end of communication
+        I2C_SR1(I2C1) &= ~(I2C_SR1_AF);
     }
 
 }
