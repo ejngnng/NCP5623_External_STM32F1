@@ -49,6 +49,7 @@ void driver_i2c1_setup(uint8_t addr){
 
 }
 
+#ifndef LED_NCP5623
 // ANYLED for ardupilot
 void i2c1_ev_isr(){
     uint32_t sr1, sr2;
@@ -94,7 +95,8 @@ void i2c1_ev_isr(){
 
 }
 
-#if 0 // NCP5623 LED data
+#else
+// NCP5623 LED data
 void i2c1_ev_isr(){
     uint32_t sr1, sr2;
     if(I2C_SR1(I2C1) & I2C_SR1_ADDR){
