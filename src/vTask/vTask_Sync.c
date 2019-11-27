@@ -39,10 +39,6 @@ void vTask_Sync(void *args){
         }else{
             if(xTaskGetTickCount() - last_update >  300){
                 sync_timeout = true;
-                for(uint8_t i=0; i<SYNC_LED_NUMS; i++){
-                    driver_ws2812_set_pixel_rgb(color_to_rgb(RGB_Black), i);
-                }
-                driver_ws2812_show();
             }
         } 
         vTaskDelay(100);
