@@ -6,6 +6,6 @@
 #else
 #define THISFIRMWARE    "APM_EXTERNAL_LED_PRO"
 #endif
-#define THISVERSION     "V2.0.3"
+#define THISVERSION     "V2.0.4"
 
 #endif
