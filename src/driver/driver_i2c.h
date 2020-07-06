@@ -8,11 +8,15 @@
 #include <libopencm3/cm3/nvic.h>
 #include "color/color.h"
 
-#ifdef LED_NCP5623
-#define LED_I2C_ADDR   0x38
-#else
-#define LED_I2C_ADDR    0x90
-#endif
+// #ifdef LED_NCP5623
+// #define LED_I2C_ADDR   0x38
+// #else
+// #define LED_I2C_ADDR    0x90
+// #endif
+typedef enum{
+    LED_NCP5623 = 0,
+    LED_ANYLED = 1,
+}led_type_t;
 
 void driver_i2c1_setup(uint8_t addr);
 

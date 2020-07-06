@@ -28,6 +28,15 @@ try:
 except IOError:
     print("fail to read file %s" % target_filename)
 
+if(defines.get("BUILD_LED_TYPE") == "LED_NCP5623"):
+    print("LED type: NCP5623")
+    fw_name = "APM_EXTERNAL_LED_COM"
+elif(defines.get("BUILD_LED_TYPE") == "LED_ANYLED"):
+    print("LED type: ANYLED")
+    fw_name = "APM_EXTERNAL_LED_PRO"
+else:
+    print("LED type: unknown")
+    fw_name = "APM_EXETRNAL_UNKNOWN"
 #env.Replace(PROGNAME="firmware_%s" % buildtime)
 #env.Replace(PROGNAME = "FGSR_%s" % defines.get("VERSION"))
-env.Replace(PROGNAME = "%s_%s" % (eval(fw_name),eval(fw_version)))
+env.Replace(PROGNAME = "%s_%s" % (fw_name, eval(fw_version)))

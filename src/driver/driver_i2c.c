@@ -49,110 +49,105 @@ void driver_i2c1_setup(uint8_t addr){
 
 }
 
-#ifndef LED_NCP5623
 // ANYLED for ardupilot
 void i2c1_ev_isr(){
-    uint32_t sr1, sr2;
-    sr1 = I2C_SR1(I2C1);
+    if(BUILD_LED_TYPE == LED_ANYLED){
+        uint32_t sr1, sr2;
+        sr1 = I2C_SR1(I2C1);
 
-    // address matched slave
-    if(sr1 & I2C_SR1_ADDR){
-        sr2 = I2C_SR2(I2C1);
-        (void)sr2;
-        #if (DEBUG_IIC==1)
-        usart1_printf("Address matched\n");
-        #endif
-    }else if(sr1 & I2C_SR1_RxNE){ // Receive buffer not empty
-        uint8_t data = i2c_get_data(I2C1);
-        switch(counter){
-            case 0:
-                Colors.r = data;
-                counter ++;
-                break;
-            case 1:
-                Colors.g = data;
-                counter ++;
-                break;
-            case 2:
-                Colors.b = data;
+        // address matched slave
+        if(sr1 & I2C_SR1_ADDR){
+            sr2 = I2C_SR2(I2C1);
+            (void)sr2;
+            #if (DEBUG_IIC==1)
+            usart1_printf("ANYLED Address matched\n");
+            #endif
+        }else if(sr1 & I2C_SR1_RxNE){ // Receive buffer not empty
+            uint8_t data = i2c_get_data(I2C1);
+            switch(counter){
+                case 0:
+                    Colors.r = data;
+                    counter ++;
+                    break;
+                case 1:
+                    Colors.g = data;
+                    counter ++;
+                    break;
+                case 2:
+                    Colors.b = data;
+                    counter = 0;
+                    update = true;
+                    break;
+                default:
+                    break;
+            }
+        }else if((sr1 & I2C_SR1_TxE) && !(sr1 & I2C_SR1_BTF)){ // transmit buffer empty & data transfer not finished
+            i2c_send_data(I2C1, 0);
+        }else if(sr1 & I2C_SR1_STOPF){  // done by master by sending STOP
+        // sr1 = I2C_SR1(I2C1);        // this even happens when slave is in Recv mode at the end of communication
+            i2c_peripheral_enable(I2C1);
+            #if (DEBUG_IIC==1)
+            usart1_printf("Master stop, data: %02X\n", i2c_get_data(I2C1));
+            #endif
+        }else if(sr1 & I2C_SR1_AF){ // this event happens when slave is in transmit mode at the end of communication
+            I2C_SR1(I2C1) &= ~(I2C_SR1_AF);
+        }
+    } else if(BUILD_LED_TYPE == LED_NCP5623){
+        uint32_t sr1, sr2;
+        if(I2C_SR1(I2C1) & I2C_SR1_ADDR){
+            sr1 = I2C_SR1(I2C1);
+            sr2 = I2C_SR2(I2C1);
+            (void)sr1;
+            (void)sr2;
+            #if (DEBUG_IIC==1)
+            usart1_printf("NCP5623 Address matched\n");
+            #endif
+        }
+
+        if(I2C_SR1(I2C1) & I2C_SR1_RxNE){
+            uint8_t data = i2c_get_data(I2C1);
+            switch(data & 0xE0){
+                case 0:
+                    break;
+                case 0x20:
+                    break;
+                case 0x40:
+                    #if (DEBUG_IIC==1)
+                    usart1_printf("PWM1: %02X\n", data & 0x1F);
+                    #endif
+                    counter++;
+                    Colors.r = data & 0x1F;
+                    break;
+                case 0x60:
+                    #if (DEBUG_IIC==1)
+                    usart1_printf("PWM2: %02X\n", data & 0x1F);
+                    #endif
+                    counter++;
+                    Colors.g = data & 0x1F;
+                    break;
+                case 0x80:
+                    #if (DEBUG_IIC==1)
+                    usart1_printf("PWM3: %02X\n", data & 0x1F);
+                    #endif
+                    counter++;
+                    Colors.b = data & 0x1F;
+                    break;
+                default:
+                    break;
+            }
+            if(counter >= 3){
                 counter = 0;
                 update = true;
-                break;
-            default:
-                break;
+            }
         }
-    }else if((sr1 & I2C_SR1_TxE) && !(sr1 & I2C_SR1_BTF)){ // transmit buffer empty & data transfer not finished
-        i2c_send_data(I2C1, 0);
-    }else if(sr1 & I2C_SR1_STOPF){  // done by master by sending STOP
-       // sr1 = I2C_SR1(I2C1);        // this even happens when slave is in Recv mode at the end of communication
-        i2c_peripheral_enable(I2C1);
-        #if (DEBUG_IIC==1)
-        usart1_printf("Master stop, data: %02X\n", i2c_get_data(I2C1));
-        #endif
-    }else if(sr1 & I2C_SR1_AF){ // this event happens when slave is in transmit mode at the end of communication
-        I2C_SR1(I2C1) &= ~(I2C_SR1_AF);
-    }
 
+        if(I2C_SR1(I2C1) & I2C_SR1_STOPF){
+            sr1 = I2C_SR1(I2C1);
+            i2c_peripheral_enable(I2C1);
+            #if (DEBUG_IIC==1)
+            usart1_printf("Master stop, data: %02X\n", i2c_get_data(I2C1));
+            #endif
+        }
+    }
+    
 }
-
-#else
-// NCP5623 LED data
-void i2c1_ev_isr(){
-    uint32_t sr1, sr2;
-    if(I2C_SR1(I2C1) & I2C_SR1_ADDR){
-        sr1 = I2C_SR1(I2C1);
-        sr2 = I2C_SR2(I2C1);
-        (void)sr1;
-        (void)sr2;
-        #if (DEBUG_IIC==1)
-        usart1_printf("Address matched\n");
-        #endif
-    }
-
-    if(I2C_SR1(I2C1) & I2C_SR1_RxNE){
-        uint8_t data = i2c_get_data(I2C1);
-        switch(data & 0xE0){
-            case 0:
-                break;
-            case 0x20:
-                break;
-            case 0x40:
-                #if (DEBUG_IIC==1)
-                usart1_printf("PWM1: %02X\n", data & 0x1F);
-                #endif
-                counter++;
-                Colors.r = data & 0x1F;
-                break;
-            case 0x60:
-                #if (DEBUG_IIC==1)
-                usart1_printf("PWM2: %02X\n", data & 0x1F);
-                #endif
-                counter++;
-                Colors.g = data & 0x1F;
-                break;
-            case 0x80:
-                #if (DEBUG_IIC==1)
-                usart1_printf("PWM3: %02X\n", data & 0x1F);
-                #endif
-                counter++;
-                Colors.b = data & 0x1F;
-                break;
-            default:
-                break;
-        }
-        if(counter >= 3){
-            counter = 0;
-            update = true;
-        }
-    }
-
-    if(I2C_SR1(I2C1) & I2C_SR1_STOPF){
-        sr1 = I2C_SR1(I2C1);
-        i2c_peripheral_enable(I2C1);
-        #if (DEBUG_IIC==1)
-        usart1_printf("Master stop, data: %02X\n", i2c_get_data(I2C1));
-        #endif
-    }
-
-}
-#endif

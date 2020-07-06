@@ -17,7 +17,12 @@ static void vTask_Sync_Setup(){
     sync_timeout = true;
     memset(&Colors, 0, sizeof(rgb_t));
     driver_ws2812_setup(SYNC_LED_NUMS);
-    driver_i2c1_setup(LED_I2C_ADDR);
+    if(BUILD_LED_TYPE == LED_NCP5623){
+        driver_i2c1_setup(0x38);
+    }else{
+        driver_i2c1_setup(0x90);
+    }
+
     driver_timer2_setup();
     driver_dma1_setup(DMA_CHANNEL7);
 }
@@ -40,6 +45,7 @@ void vTask_Sync(void *args){
             if(xTaskGetTickCount() - last_update >  300){
                 sync_timeout = true;
             }
+            driver_ws2812_show();
         } 
         vTaskDelay(100);
     }
